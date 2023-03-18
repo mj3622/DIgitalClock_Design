@@ -1,25 +1,3 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 2023/03/18 20:54:22
-// Design Name: 
-// Module Name: clock
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
-
 module clock(
     input CP,
     input _CR,
@@ -35,4 +13,15 @@ module clock(
     output [7:0] select_light,
     output [7:0] display_char
     );
+
+    wire CP_1Hz, CP_1KHz;
+
+    divider divider_u0(
+        ._CR(_CR),
+        .CP(CP),
+        .CP_1Hz(CP_1KHz),
+        .CP_1KHz(CP_1KHz)
+    );
+
+    
 endmodule
