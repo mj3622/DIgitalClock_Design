@@ -13,6 +13,6 @@ module select_control(
     input time_mode,
     output [31:0] display_time,
     output [7:0] index,
-    output PE
+    output [1:0] PE
     );
 endmodule

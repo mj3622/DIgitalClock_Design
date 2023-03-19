@@ -3,6 +3,7 @@ module splitter(
     input [31:0] display_time,
     input time_mode,
     input mode,
+    input PE,
     output [7:0] pre_sec,
     output [7:0] pre_min,
     output [7:0] pre_hour,
