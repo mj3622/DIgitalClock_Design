@@ -130,6 +130,7 @@ module clock(
         .start_light_hour(cin_hour),
         .start_light_alarm(start_light_alarm),
         .show_hour(show_hour),
+        .active_alarm(active_alarm),
         .start_light(start_light)
     );
     
