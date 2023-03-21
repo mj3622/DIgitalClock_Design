@@ -7,7 +7,7 @@ module alarm(
     input [7:0] show_hour,
     input [7:0] show_min,
     input [7:0] show_sec,
-    output [15:0] start_light,
+    output start_light_alarm,
     output [31:0] alarm_time
     );
 endmodule

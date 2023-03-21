@@ -32,6 +32,8 @@ module clock(
     wire[31:0] alarm_time;  // the alarm time  
     wire[31:0] display_time;// the final code char 
 
+    wire start_light_alarm, start_light_hour;   //provide info  
+
     divider divider_u0(         
         ._CR(_CR),
         .CP(CP),
@@ -77,7 +79,7 @@ module clock(
         .show_hour(show_hour),
         .show_min(show_min),
         .show_sec(show_sec),
-        .start_light(start_light),
+        .start_light_alarm(start_light_alarm),
         .alarm_time(alarm_time)
     );
 
@@ -120,6 +122,15 @@ module clock(
         .CP_1KHz(CP_1KHz),
         .select_light(select_light),
         .display_char(display_char)
+    );
+
+    reminder reminder_u0(
+        ._CR(_CR),
+        .CP_1Hz(CP_1Hz),
+        .start_light_hour(cin_hour),
+        .start_light_alarm(start_light_alarm),
+        .show_hour(show_hour),
+        .start_light(start_light)
     );
     
 endmodule

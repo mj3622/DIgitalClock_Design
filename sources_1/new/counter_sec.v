@@ -8,4 +8,7 @@ module counter_sec(
     output [7:0] show_sec,
     output cin_sec
     );
+
+    
+
 endmodule
