@@ -20,7 +20,7 @@ module counter_hour(
             begin   
             show_hour = show_hour + 1;
             cin_hour = 0;
-            if(show_hour == 8'd60) begin
+            if(show_hour == 8'd24) begin
                 show_hour = 0;
                 cin_hour = 1;
             end

@@ -18,8 +18,8 @@ module clock(
     wire CP_1Hz, CP_1KHz;               // 1Hz & 1KHz signals
     wire PE;                            // apply the changes to splitter
     wire cin_sec, cin_min, cin_hour;    // Carry signals
-    wire PE_alarm, PE_counter;            // determine apply to whitch
-    wire [7:0] index;                   // the index selected
+    wire PE_alarm, PE_counter;          // determine apply to whitch
+    wire [3:0]index;                    // the index selected
 
     wire [7:0] pre_sec;
     wire [7:0] pre_min;
@@ -30,14 +30,15 @@ module clock(
     wire [7:0] show_hour;   // the counter time
 
     wire[31:0] alarm_time;  // the alarm time  
-    wire[31:0] display_time;// the final code char 
+    wire[63:0] display_time;// the final code char 
+    wire[31:0] set_time;    // user set
 
     wire start_light_alarm, start_light_hour;   //provide info  
 
     divider divider_u0(         
         ._CR(_CR),
         .CP(CP),
-        .CP_1Hz(CP_1KHz),
+        .CP_1Hz(CP_1Hz),
         .CP_1KHz(CP_1KHz)
     );
 
@@ -88,7 +89,7 @@ module clock(
         .mode(mode),
         .CP_1KHz(CP_1Hz),
         .adjust(adjust),
-        .show_time({show_hour,show_min,show_sec}),
+        .show_time({show_hour,show_min,show_sec,8'b0}),
         .alarm_time(alarm_time),
         .left(left),
         .right(right),
@@ -97,19 +98,20 @@ module clock(
         .apply(apply),
         .time_mode(time_mode),
         .display_time(display_time),
+        .set_time(set_time),
         .index(index),
         .PE(PE)
     );
 
     splitter splitter_u0(
         ._CR(_CR),
-        .display_time(display_char),
+        .display_time(set_time),
         .time_mode(time_mode),
         .mode(mode),
         .PE(PE),
         .pre_sec(pre_sec),
         .pre_min(pre_min),
-        .pre_sec(pre_sec),
+        .pre_hour(pre_hour),
         .PE_alarm(PE_alarm),
         .PE_counter(PE_counter)
     );
@@ -127,7 +129,7 @@ module clock(
     reminder reminder_u0(
         ._CR(_CR),
         .CP_1Hz(CP_1Hz),
-        .start_light_hour(cin_hour),
+        .start_light_hour(cin_min),
         .start_light_alarm(start_light_alarm),
         .show_hour(show_hour),
         .active_alarm(active_alarm),

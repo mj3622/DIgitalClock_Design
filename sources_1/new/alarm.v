@@ -26,6 +26,7 @@ module alarm(
             if(alarm_time == {show_hour,show_min,show_sec,8'b0}) start_light_alarm = 1;
             else start_light_alarm = 0;
         end
+        else start_light_alarm = 0;
     end
 
 endmodule
