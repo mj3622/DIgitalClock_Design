@@ -13,9 +13,10 @@ module clock(
     output [15:0] start_light,  // alarm work signals
     output [7:0] select_light,  // select one tube work 
     output [7:0] display_char   // the char displayed
+    
     );
 
-    wire CP_1Hz, CP_1KHz;               // 1Hz & 1KHz signals
+    wire CP_1Hz, CP_1KHz, CLK_Freq_10Hz;               // 1Hz & 1KHz &10Hz signals
     wire PE;                            // apply the changes to splitter
     wire cin_sec, cin_min, cin_hour;    // Carry signals
     wire PE_alarm, PE_counter;          // determine apply to whitch
@@ -39,7 +40,8 @@ module clock(
         ._CR(_CR),
         .CP(CP),
         .CP_1Hz(CP_1Hz),
-        .CP_1KHz(CP_1KHz)
+        .CP_1KHz(CP_1KHz),
+        .CP_10Hz(CP_10Hz)
     );
 
     counter_sec counter_sec_u0(
@@ -87,7 +89,7 @@ module clock(
     select_control select_control_u0(
         ._CR(_CR),
         .mode(mode),
-        .CP_1KHz(CP_1Hz),
+        .CP_1KHz(CP_10Hz),
         .adjust(adjust),
         .show_time({show_hour,show_min,show_sec,8'b0}),
         .alarm_time(alarm_time),
@@ -132,6 +134,7 @@ module clock(
         .start_light_hour(cin_min),
         .start_light_alarm(start_light_alarm),
         .show_hour(show_hour),
+        .show_sec(show_sec),
         .active_alarm(active_alarm),
         .start_light(start_light)
     );

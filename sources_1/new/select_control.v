@@ -67,29 +67,89 @@ module select_control(
                 
 
                 // outer control
-                if(left) index = index == 0 ? 4'd7 : index - 1;
-                else if(right) index = index == 4'd7 ? 0 : index + 1;
+                if(left) begin
+                    case(index)
+                        4'd0: begin if(mode) index = 4'd4; else index = time_mode ? 4'd5 : 4'd7; end
+                        4'd1: begin index = 4'd0; end
+                        4'd2: begin index = 4'd1; end
+                        4'd3: begin index = 4'd2;  end
+                        4'd4: begin index = 4'd3;  end
+                        4'd5: begin index = 4'd4;  end
+                        4'd7: begin index = 4'd5;  end
+                        default begin index = 0; end
+                    endcase
+                end
+                else if(right) begin
+                    case(index)
+                        4'd0: begin index = 4'd1; end
+                        4'd1: begin index = 4'd2; end
+                        4'd2: begin index = 4'd3; end
+                        4'd3: begin if(mode) index = 4'd0; else index = 4'd4;  end
+                        4'd4: begin index = 4'd5;  end
+                        4'd5: begin index = time_mode ? 4'd0 : 4'd7;  end
+                        4'd7: begin index = 4'd0;  end
+                        default begin index = 0; end
+                    endcase
+                end
                 else if(up) begin
                     case(index)
-                        4'd0:begin temp_time[31:28] = temp_time[31:28] == s2 ? s0 : temp_time[31:28] +1;end
-                        4'd1:if(temp_time[31:28] == 4'd2)begin temp_time[27:24] = temp_time[27:24] == s3 ? s0 : temp_time[27:24] +1;end else temp_time[27:24] = temp_time[27:24] == s9 ? s0 : temp_time[27:24] +1;
+                        4'd0:begin  if(mode || time_mode)begin
+                                        if(temp_time[27:24] < 4) temp_time[31:28] = temp_time[31:28] == s2 ? s0 : temp_time[31:28] +1; 
+                                        else temp_time[31:28] = temp_time[31:28] == s1 ? s0 : temp_time[31:28] +1; 
+                                    end
+                                    else begin
+                                        if(temp_time[27:24] > 2) temp_time[31:28] = 0;
+                                        else temp_time[31:28] = temp_time[31:28] == s1 ? s0 : s1; 
+                                    end 
+                            end
+                        4'd1:begin 
+                            if(mode || time_mode) begin
+                                if(temp_time[31:28] == 4'd2)begin temp_time[27:24] = temp_time[27:24] == s3 ? s0 : temp_time[27:24] + 4'd1;end 
+                                else temp_time[27:24] = temp_time[27:24] == s9 ? s0 : temp_time[27:24] +4'd1;
+                            end
+                            else begin
+                                if(temp_time[31:28] == 4'd1)begin 
+                                    temp_time[27:24] = temp_time[27:24] == s2 ? s0 : temp_time[27:24] + 1;
+                                end 
+                                else temp_time[27:24] = temp_time[27:24] == s9 ? s0 : temp_time[27:24] +1;
+                            end
+                            end
                         4'd2:begin temp_time[23:20] = temp_time[23:20] == s5 ? s0 : temp_time[23:20] +1;end 
                         4'd3:begin temp_time[19:16] = temp_time[19:16] == s9 ? s0 : temp_time[19:16] +1;end
                         4'd4:if(~mode)begin temp_time[15:12] = temp_time[15:12] == s5 ? s0 : temp_time[15:12] +1;end
                         4'd5:if(~mode)begin temp_time[11:8]  = temp_time[11:8]  == s9 ? s0 : temp_time[11:8]  +1;end
-                        4'd7:if(~mode & ~time_mode) begin temp_time[3:0] = temp_time[3:0] == sA ? sP : sA;end
+                        4'd7:begin temp_time[3:0] = temp_time[3:0] == sA ? sP : sA;end
                         default: ;
                     endcase
                 end
                 else if(down) begin
                     case(index)
-                        4'd0:begin temp_time[31:28] = temp_time[31:28] == s0 ? s2 : temp_time[31:28] -1;end
-                        4'd1:if(temp_time[31:28] == 4'd2)begin temp_time[27:24] = temp_time[27:24] == s0 ? s3 : temp_time[27:24] - 1;end else temp_time[27:24] = temp_time[27:24] == s0 ? s9 : temp_time[27:24] -1;
+                        4'd0:begin  if(mode || time_mode)begin
+                                        if(temp_time[27:24] < 4) temp_time[31:28] = temp_time[31:28] == s0 ? s2 : temp_time[31:28] - 1; 
+                                        else temp_time[31:28] = temp_time[31:28] == s0 ? s1 : temp_time[31:28] - 1; 
+                                    end
+                                    else begin
+                                        if(temp_time[27:24] > 2) temp_time[31:28] = 0;
+                                        else temp_time[31:28] = temp_time[31:28] == s1 ? s0 : s1; 
+                                    end 
+                            end
+                        4'd1:begin 
+                            if(mode || time_mode) begin
+                                if(temp_time[31:28] == 4'd2)begin temp_time[27:24] = temp_time[27:24] == s0 ? s3 : temp_time[27:24] - 4'd1;end 
+                                else temp_time[27:24] = temp_time[27:24] == s0 ? s9 : temp_time[27:24] - 4'd1;
+                            end
+                            else begin
+                                if(temp_time[31:28] == 4'd1)begin 
+                                    temp_time[27:24] = temp_time[27:24] == s0 ? s2 : temp_time[27:24] - 1;
+                                end 
+                                else temp_time[27:24] = temp_time[27:24] == s0 ? s9 : temp_time[27:24] - 1;
+                            end
+                            end
                         4'd2:begin temp_time[23:20] = temp_time[23:20] == s0 ? s5 : temp_time[23:20] -1;end 
                         4'd3:begin temp_time[19:16] = temp_time[19:16] == s0 ? s9 : temp_time[19:16] -1;end
-                        4'd4:if(~mode)begin temp_time[15:12] = temp_time[15:12] == s5 ? s0 : temp_time[15:12] -1;end
-                        4'd5:if(~mode)begin temp_time[11:8]  = temp_time[11:8]  == s9 ? s0 : temp_time[11:8]  -1;end
-                        4'd7:if(~mode & ~time_mode) begin temp_time[3:0] = temp_time[3:0] == sA ? sP : sA;end
+                        4'd4:if(~mode)begin temp_time[15:12] = temp_time[15:12] == s0 ? s5 : temp_time[15:12] -1;end
+                        4'd5:if(~mode)begin temp_time[11:8]  = temp_time[11:8]  == s0 ? s9 : temp_time[11:8]  -1;end
+                        4'd7:begin temp_time[3:0] = temp_time[3:0] == sA ? sP : sA;end
                         default: ;
                     endcase
                 end
@@ -115,7 +175,7 @@ module select_control(
                         s7:begin set_time[27:24] = s7; display_time[55:48] = L7; end
                         s8:begin set_time[27:24] = s8; display_time[55:48] = L8; end
                         s9:begin set_time[27:24] = s9; display_time[55:48] = L9; end
-                        default:begin set_time[31:28] = s0; display_time[55:48] = L0; end
+                        default:begin set_time[27:24] = s0; display_time[55:48] = L0; end
                     endcase
 
                     // set higher minute
@@ -145,64 +205,38 @@ module select_control(
                     endcase
 
                     // set left part
-                    set_time[15:0] = {sB,sE,sE,sL};
-                    display_time[31:0] = {LB,LE,LE,LL};
+                    set_time[15:0] = {sB,sE,sL,sL};
+                    display_time[31:0] = {LB,LE,LL,LL};
             end
             else begin      // clock mode
-                    if(time_mode) begin
-                        // set higher hour
-                        display_time[15:0] = {LExcept,LExcept};
-                        case(temp_time[31:28]) 
-                            s0:begin set_time[31:28] = s0; display_time[63:56] = L0; end
-                            s1:begin set_time[31:28] = s1; display_time[63:56] = L1; end
-                            s2:begin set_time[31:28] = s2; display_time[63:56] = L2; end
-                            default:begin set_time[31:28] = s0; display_time[63:56] = L0; end
-                        endcase
-                        
-                        // set lower hour
-                        case(temp_time[27:24]) 
-                            s0:begin set_time[27:24] = s0; display_time[55:48] = L0; end
-                            s1:begin set_time[27:24] = s1; display_time[55:48] = L1; end
-                            s2:begin set_time[27:24] = s2; display_time[55:48] = L2; end
-                            s3:begin set_time[27:24] = s3; display_time[55:48] = L3; end
-                            s4:begin set_time[27:24] = s4; display_time[55:48] = L4; end
-                            s5:begin set_time[27:24] = s5; display_time[55:48] = L5; end
-                            s6:begin set_time[27:24] = s6; display_time[55:48] = L6; end
-                            s7:begin set_time[27:24] = s7; display_time[55:48] = L7; end
-                            s8:begin set_time[27:24] = s8; display_time[55:48] = L8; end
-                            s9:begin set_time[27:24] = s9; display_time[55:48] = L9; end
-                            default:begin set_time[31:28] = s0; display_time[55:48] = L0; end
-                        endcase
+                    if(time_mode) display_time[15:0] = {LExcept,LExcept};
+                    else  begin
+                        set_time[7:0] = temp_time[7:0];
+                        display_time[16:0] = {LExcept,temp_time[3:0] == sA ? LA : LP};
                     end
-                    else begin
-                        if(temp_time[31:24] == {s1,s2}) begin set_time[31:24] = {s1,s2}; display_time[63:48] = {L1,L2}; display_time[7:0] = LA; end
-                        else if(temp_time[31:24] == 8'd0) begin set_time[31:24] = {s1,s2}; display_time[63:48] = {L1,L2}; display_time[7:0] = LP; end
-                        else begin
-                            display_time[7:0] = temp_time[3:0] == sP ? LP : LA;
-                        
-                        // set higher hour
-                        case(((temp_time[31:28]*10 + temp_time[27:24]) % 12) / 10) 
-                            s0:begin set_time[31:28] = s0; display_time[63:56] = L0; end
-                            s1:begin set_time[31:28] = s1; display_time[63:56] = L1; end
-                            default:begin set_time[31:28] = s0; display_time[63:56] = L0; end
-                        endcase
-                        
-                        // set lower hour
-                        case(((temp_time[31:28]*10 + temp_time[27:24]) % 12) % 10) 
-                            s0:begin set_time[27:24] = s0; display_time[55:48] = L0; end
-                            s1:begin set_time[27:24] = s1; display_time[55:48] = L1; end
-                            s2:begin set_time[27:24] = s2; display_time[55:48] = L2; end
-                            s3:begin set_time[27:24] = s3; display_time[55:48] = L3; end
-                            s4:begin set_time[27:24] = s4; display_time[55:48] = L4; end
-                            s5:begin set_time[27:24] = s5; display_time[55:48] = L5; end
-                            s6:begin set_time[27:24] = s6; display_time[55:48] = L6; end
-                            s7:begin set_time[27:24] = s7; display_time[55:48] = L7; end
-                            s8:begin set_time[27:24] = s8; display_time[55:48] = L8; end
-                            s9:begin set_time[27:24] = s9; display_time[55:48] = L9; end
-                            default:begin set_time[27:24] = s0; display_time[55:48] = L0; end
-                        endcase
-                        end
-                    end
+
+                    // set higher hour
+                    case(temp_time[31:28]) 
+                        s0:begin set_time[31:28] = s0; display_time[63:56] = L0; end
+                        s1:begin set_time[31:28] = s1; display_time[63:56] = L1; end
+                        s2:begin set_time[31:28] = s2; display_time[63:56] = L2; end
+                        default:begin set_time[31:28] = s0; display_time[63:56] = L0; end
+                    endcase
+                    
+                    // set lower hour
+                    case(temp_time[27:24]) 
+                        s0:begin set_time[27:24] = s0; display_time[55:48] = L0; end
+                        s1:begin set_time[27:24] = s1; display_time[55:48] = L1; end
+                        s2:begin set_time[27:24] = s2; display_time[55:48] = L2; end
+                        s3:begin set_time[27:24] = s3; display_time[55:48] = L3; end
+                        s4:begin set_time[27:24] = s4; display_time[55:48] = L4; end
+                        s5:begin set_time[27:24] = s5; display_time[55:48] = L5; end
+                        s6:begin set_time[27:24] = s6; display_time[55:48] = L6; end
+                        s7:begin set_time[27:24] = s7; display_time[55:48] = L7; end
+                        s8:begin set_time[27:24] = s8; display_time[55:48] = L8; end
+                        s9:begin set_time[27:24] = s9; display_time[55:48] = L9; end
+                        default:begin set_time[27:24] = s0; display_time[55:48] = L0; end
+                    endcase
 
                     // set higher minute
                     case(temp_time[23:20]) 
@@ -258,8 +292,12 @@ module select_control(
                 end    
 
             end
-            else begin          // normal mode
+
+            // don't in adjust mode
+            else begin
+                index = 0;          
                 if(mode) begin  // alarm mode
+                    temp_time = set_time;
                     // set higher hour
                     case(alarm_time[31:24] / 10) 
                         s0:begin set_time[31:28] = s0; display_time[63:56] = L0; end
@@ -280,7 +318,7 @@ module select_control(
                         s7:begin set_time[27:24] = s7; display_time[55:48] = L7; end
                         s8:begin set_time[27:24] = s8; display_time[55:48] = L8; end
                         s9:begin set_time[27:24] = s9; display_time[55:48] = L9; end
-                        default:begin set_time[31:28] = s0; display_time[55:48] = L0; end
+                        default:begin set_time[27:24] = s0; display_time[55:48] = L0; end
                     endcase
 
                     // set higher minute
@@ -310,13 +348,14 @@ module select_control(
                     endcase
 
                     // set left part
-                    set_time[15:0] = {sB,sE,sE,sL};
-                    display_time[31:0] = {LB,LE,LE,LL};
+                    set_time[15:0] = {sB,sE,sL,sL};
+                    display_time[31:0] = {LB,LE,LL,LL};
                 end
                 else begin      // clock mode
                     if(time_mode) begin
                         // set higher hour
                         display_time[15:0] = {LExcept,LExcept};
+                        set_time[7:0] = 0;
                         case(show_time[31:24] / 10) 
                             s0:begin set_time[31:28] = s0; display_time[63:56] = L0; end
                             s1:begin set_time[31:28] = s1; display_time[63:56] = L1; end
@@ -336,15 +375,15 @@ module select_control(
                             s7:begin set_time[27:24] = s7; display_time[55:48] = L7; end
                             s8:begin set_time[27:24] = s8; display_time[55:48] = L8; end
                             s9:begin set_time[27:24] = s9; display_time[55:48] = L9; end
-                            default:begin set_time[31:28] = s0; display_time[55:48] = L0; end
+                            default:begin set_time[27:24] = s0; display_time[55:48] = L0; end
                         endcase
                     end
                     else begin
-                        if(show_time[31:24] == 8'd12) begin set_time[31:24] = {s1,s2}; display_time[63:48] = {L1,L2}; display_time[7:0] = LA; end
-                        else if(show_time[31:24] == 8'd0) begin set_time[31:24] = {s1,s2}; display_time[63:48] = {L1,L2}; display_time[7:0] = LP; end
+                        if(show_time[31:24] == 8'd12) begin set_time[31:24] = {s1,s2}; display_time[63:48] = {L1,L2}; display_time[7:0] = LP; set_time[7:0] = {s0,sP}; end
+                        else if(show_time[31:24] == 8'd0) begin set_time[31:24] = {s1,s2}; display_time[63:48] = {L1,L2}; display_time[7:0] = LA; set_time[7:0] = {s0,sA};end
                         else begin
                             display_time[7:0] = show_time[31:24] > 8'd12 ? LP : LA;
-                        
+                            set_time[7:0] = {s0,show_time[31:24] > 8'd12 ? sP : sA};
                         // set higher hour
                         case((show_time[31:24] % 12) / 10) 
                             s0:begin set_time[31:28] = s0; display_time[63:56] = L0; end
@@ -420,8 +459,9 @@ module select_control(
                         s9:begin set_time[11:8] = s9; display_time[23:16] = L9; end
                         default:begin set_time[11:8] = s0; display_time[23:16] = L0; end
                     endcase
+                    display_time[15:8] = LExcept;
+                    temp_time = set_time;
                 end
-                temp_time = set_time;
             end
             PE = adjust & apply;
         end

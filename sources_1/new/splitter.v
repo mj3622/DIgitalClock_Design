@@ -52,7 +52,7 @@ module splitter(
                         pre_hour <= display_time[3:0] == sP ? 4'd12 : 4'd0;
                     end
                     else begin
-                        pre_hour <= display_time[31:28]*10 + display_time[27:24] + display_time[3:0] == sP ? 4'd12 : 4'd0;
+                        pre_hour <= display_time[31:28]*10 + display_time[27:24] + (display_time[3:0] == sP ? 4'd12 : 4'd0);
                     end
                 end
                 // set min and sec
